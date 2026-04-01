@@ -23,3 +23,23 @@ class Bond:
             bond_price += coupon_payment/(1 + period_yield_rate) ** i                                     # Coupon payment per period (i) added to the total coupon payment
         bond_price += (coupon_payment + self.face_value)/(1 + period_yield_rate) ** total_num_payments    # Final payment includes coupon payment & face value
         return bond_price
+
+    def ytm(self, market_price, accuracy = 0.0001):    # implement a bescetion guess method
+        test_yield_lower_bound = 0.0001
+        test_yield_upper_bound = 1
+        
+        midpoint = (test_yield_upper_bound + test_yield_lower_bound) / 2    # Guess what the yield is by testing the midpoint between the two values
+        test_price = self.price(midpoint)                                   # Calculate what the bond price is at that midpoint yield
+
+        # Check whether the price resulting from the test yield's bounds equal to 
+        # or within the specified accuracy of the market price.
+        while abs(test_price - market_price) >= accuracy:                       
+            if market_price > test_price:                                       
+               test_yield_upper_bound = midpoint                                # test_price is less than the market price (the upper bound was too high)
+            else:
+                test_yield_lower_bound = midpoint                               # test_price is greater than the market price (the lower bound was too low)
+            
+            midpoint = (test_yield_upper_bound + test_yield_lower_bound) / 2    # Guess what the yield is by testing the midpoint between the two values
+            test_price = self.price(midpoint)                                   # Calculate what the bond price is at that midpoint yeild
+
+        return midpoint
