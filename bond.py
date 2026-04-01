@@ -43,3 +43,15 @@ class Bond:
             test_price = self.price(midpoint)                                   # Calculate what the bond price is at that midpoint yeild
 
         return midpoint
+
+    # TODO: Add explanation of what macaulay duration is & how it relates to sensitivity with interest rate changes
+    def macaulay_duration(self, yield_rate):    
+        coupon_payment = self.face_value * self.coupon_rate / self.frequency
+        total_num_payments = self.maturity * self.frequency 
+        period_yield_rate = yield_rate / self.frequency  
+                                                                               
+        weighted_present_value = 0                                                                                     
+        for i in range(1, total_num_payments):                                                            
+            weighted_present_value += (coupon_payment/(1 + period_yield_rate) ** i) * i / self.frequency                                  
+        weighted_present_value += ((coupon_payment + self.face_value)/(1 + period_yield_rate) ** total_num_payments) * total_num_payments
+        return weighted_present_value / self.price(yield_rate)
