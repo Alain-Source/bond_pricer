@@ -67,9 +67,9 @@ class Bond:
     def convexity(self, yield_rate):
         period_yield_rate = yield_rate / self.frequency  
                                                                                
-        weighted_present_value = 0                                                                                                                                                               
+        weighted_present_value = 0                                                                                                                                                                                                                   
         for i in range(1, self.total_num_payments):                                                            
-            weighted_present_value += self._present_value(self.coupon_payment, period_yield_rate, i) * i * (i + 1)                         
+            weighted_present_value += self._present_value(self.coupon_payment, period_yield_rate, i) * i * (i + 1)          # Convexity weight's present value by i * (i + 1)                  
         weighted_present_value += self._present_value(self.coupon_payment + self.face_value, period_yield_rate, self.total_num_payments) * self.total_num_payments * (self.total_num_payments + 1) 
         weighted_present_value / (self.price(yield_rate) * (1 + period_yield_rate) ** 2 * self.frequency ** 2)
         return weighted_present_value
