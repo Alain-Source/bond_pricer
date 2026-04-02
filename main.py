@@ -1,9 +1,10 @@
+from re import S
 from bond import Bond
 import numpy as np
 import matplotlib.pyplot as plt
 
 def main():  # Main function not required in Python (like in C). Used for organization as codebase grows
-    
+
     # Testing Bond methods
     test_bond = Bond(face_value=1000,coupon_rate=0.05, maturity=10, frequency=1)
     print("BOND 1")
@@ -27,13 +28,41 @@ def main():  # Main function not required in Python (like in C). Used for organi
     for i in range(len(yield_range)):
         yield_range_prices.append(test_bond.price(yield_range[i]))
     
-    # Plot the relationship between yeild rates & bond prices
+    # Plot the relationship between yeild rates & bond prices. 
+    # Save it to price_yield_curve.png
     plt.plot(yield_range, yield_range_prices)
     plt.title("Yield vs Price Relationship")
     plt.xlabel("Yield")
     plt.ylabel("Bond Prices")
     plt.tight_layout()
     plt.savefig("price_yield_curve.png")
-    
+    plt.clf()
+
+    # Multiple Maturity Bond Comparison
+    short_bond = Bond(face_value=1000,coupon_rate=0.02, maturity=2, frequency=1)       # Short maturity bond
+    medium_bond = Bond(face_value=1000,coupon_rate=0.05, maturity=10, frequency=1)      # Medium maturity bond
+    long_bond = Bond(face_value=1000,coupon_rate=0.08, maturity=30, frequency=1)        # Long maturity bond
+
+    short_bond_prices = []
+    medium_bond_prices = []
+    long_bond_prices = []
+    for i in range(len(yield_range)):
+        short_bond_prices.append(short_bond.price(yield_range[i]))
+        medium_bond_prices.append(medium_bond.price(yield_range[i]))
+        long_bond_prices.append(long_bond.price(yield_range[i]))
+
+    # Plot the relationship between yeild rates & bond prices. 
+    # Save it to price_yield_curve.png
+    plt.figure()
+    plt.plot(yield_range, short_bond_prices, label="2yr, 2% coupon")
+    plt.plot(yield_range, medium_bond_prices, label="10yr, 5% coupon")
+    plt.plot(yield_range, long_bond_prices, label="30yr, 8% coupon")
+    plt.legend()
+    plt.xlabel("Yield")
+    plt.ylabel("Bond Prices")
+    plt.tight_layout()
+    plt.savefig("bond_comparison.png")
+
+
 if __name__ == "__main__":
     main()
