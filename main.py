@@ -4,9 +4,12 @@ def main():  # Main function not required in Python (like in C). Used for organi
     test_bond = Bond(face_value=1000,coupon_rate=0.05, maturity=10, frequency=1)
     print(test_bond.price(0.05))
     print(test_bond.ytm(1000))
+    print(test_bond.macaulay_duration(0.05))
+    print(test_bond.modified_duration(0.05))
 
     test_bond_2 = Bond(face_value=1000, coupon_rate=0.0, maturity=10, frequency=1)
-    print(test_bond_2.macaulay_duration(0.0))
+    print(test_bond_2.macaulay_duration(0.05))
+    print(test_bond_2.modified_duration(0.05))
 
 if __name__ == "__main__":
     main()
