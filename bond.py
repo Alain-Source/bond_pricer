@@ -48,6 +48,7 @@ class Bond:
         return midpoint
 
     # Macaulay Duration is the weighted average time to receive the bond's cash flows.
+    # Macaulay duration is a linear approximation of price changes based on yield changes.
     def macaulay_duration(self, yield_rate):   
         period_yield_rate = yield_rate / self.frequency  
                                                                                
@@ -60,3 +61,15 @@ class Bond:
     # Modified macaulay duration provides the approximate percentage price change for a 1% change in yield."
     def modified_duration(self, yield_rate):          
         return self.macaulay_duration(yield_rate) / (1 + yield_rate / self.frequency)
+
+    # Convexity measures the curvature of the price-yield relationship.
+    # Convexity better describes the curved price-yield relationship compared to Macaulay's linear approximation
+    def convexity(self, yield_rate):
+        period_yield_rate = yield_rate / self.frequency  
+                                                                               
+        weighted_present_value = 0                                                                                                                                                               
+        for i in range(1, self.total_num_payments):                                                            
+            weighted_present_value += self._present_value(self.coupon_payment, period_yield_rate, i) * i * (i + 1)                         
+        weighted_present_value += self._present_value(self.coupon_payment + self.face_value, period_yield_rate, self.total_num_payments) * self.total_num_payments * (self.total_num_payments + 1) 
+        weighted_present_value = ((weighted_present_value / self.price(yield_rate)) / (1 + period_yield_rate) ** 2) / (self.frequency ** 2)
+        return weighted_present_value
