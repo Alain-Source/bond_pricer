@@ -56,3 +56,7 @@ class Bond:
             weighted_present_value += self._present_value(self.coupon_payment, period_yield_rate, i) * i / self.frequency     # Weight by (period / frequency of payments per period) to determine payment number                      
         weighted_present_value += self._present_value(self.coupon_payment + self.face_value, period_yield_rate, self.total_num_payments) * self.total_num_payments/ self.frequency 
         return weighted_present_value / self.price(yield_rate)
+
+    # Modified macaulay duration provides the approximate percentage price change for a 1% change in yield."
+    def modified_duration(self, yield_rate):          
+        return self.macaulay_duration(yield_rate) / (1 + yield_rate / self.frequency)
