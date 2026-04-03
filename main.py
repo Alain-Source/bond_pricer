@@ -43,13 +43,9 @@ def main():  # Main function not required in Python (like in C). Used for organi
     medium_bond = Bond(face_value=1000,coupon_rate=0.05, maturity=10, frequency=1)      # Medium maturity bond
     long_bond = Bond(face_value=1000,coupon_rate=0.08, maturity=30, frequency=1)        # Long maturity bond
 
-    short_bond_prices = []
-    medium_bond_prices = []
-    long_bond_prices = []
-    for i in range(len(yield_range)):
-        short_bond_prices.append(short_bond.price(yield_range[i]))
-        medium_bond_prices.append(medium_bond.price(yield_range[i]))
-        long_bond_prices.append(long_bond.price(yield_range[i]))
+    short_bond_prices = short_bond.price_range(yield_range)
+    medium_bond_prices = medium_bond.price_range(yield_range)
+    long_bond_prices = long_bond.price_range(yield_range)
 
     # Plot the relationship between yeild rates & bond prices. 
     # Save it to price_yield_curve.png
