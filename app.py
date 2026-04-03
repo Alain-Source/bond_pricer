@@ -1,5 +1,6 @@
 import streamlit as st
 import numpy as np
+import matplotlib.pyplot as plt
 from bond import Bond
 
 # App Title & Sub-title
@@ -149,7 +150,24 @@ with tab2:
                 maturity_3 = st.number_input("Maturity (years)", value=10, key="vis_bond_3_mat")
                 frequency_3 = st.number_input("Frequency", value=1, key="vis_bond_3_frq")
                 bond_3_enabled = st.checkbox("Enable", value=True, key="bond_3_checkbox")
-            
-            bond_1 = Bond(face_value_1, coupon_rate_1, maturity_1, frequency_1)
-            bond_2 = Bond(face_value_2, coupon_rate_2, maturity_2, frequency_2)
-            bond_3 = Bond(face_value_3, coupon_rate_3, maturity_3, frequency_3)
+        
+        # Prepare Bonds 1 to 3 and the yield range to generate the comparison plot
+        bond_1 = Bond(face_value_1, coupon_rate_1, maturity_1, frequency_1)
+        bond_2 = Bond(face_value_2, coupon_rate_2, maturity_2, frequency_2)
+        bond_3 = Bond(face_value_3, coupon_rate_3, maturity_3, frequency_3)
+
+        yield_range = np.linspace(0.01, 0.15, 100)
+
+        # Generate comparison subplots for Bonds 1 - 3
+        fig, ax = plt.subplots()
+        if bond_1_enabled:
+            ax.plot(yield_range, bond_1.price_range(yield_range), label="Bond 1")
+        if bond_2_enabled:    
+            ax.plot(yield_range, bond_2.price_range(yield_range), label="Bond 2")
+        if bond_3_enabled:
+            ax.plot(yield_range, bond_3.price_range(yield_range), label="Bond 3")
+        ax.set_title("Price-Yield Comparison")
+        ax.set_xlabel("Yield [%]")
+        ax.set_ylabel("Bond Price [R]")
+        ax.legend()
+        st.pyplot(fig)
