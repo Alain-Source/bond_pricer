@@ -13,14 +13,15 @@ if "bond_defaults" not in st.session_state:
     }
 
 def save_bond(bond_name):
+    """Store bond input values to session state when a widget changes."""
     st.session_state.bond_defaults[bond_name] = {
         "fv": st.session_state[f"fv_{bond_name}"],
-        "cr": st.session_state[f"ni_{bond_name}"],
+        "cr": st.session_state[f"cr_{bond_name}"],
         "m": st.session_state[f"mat_{bond_name}"],
         "f": st.session_state[f"feq_{bond_name}"],
     }
 
-# Global metric widget stylng using markdown css injection - Green Bold Text
+# Global metric widget styling using markdown css injection - Green Bold Text
 st.markdown("""
      <style>
     [data-testid="stMetricValue"] {
@@ -30,8 +31,8 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Display metric components with standard styling
 def display_metric(label, value, prefix="", suffix=""):
+    """Display metric components with standard styling"""
     st.markdown("<br>", unsafe_allow_html=True)
     st.metric(label=label, value=f"{prefix}{value:.2f}{suffix}")
 
@@ -42,15 +43,12 @@ st.markdown("""An interactive learning tool for exploring fixed-income fundament
 <br>Calculate bond prices, yields, and risk measures. 
 Visualise bond prices responding to changes in yield rates.""", unsafe_allow_html=True)
 
-# Setup Tabs
-tab_Calculator, tab_Visualiser = st.tabs(["Calculator", "Visualiser"])
+tab_calculator, tab_visualiser = st.tabs(["Calculator", "Visualiser"])
 
-# Calculator Tab
-with tab_Calculator:
+with tab_calculator:
     with st.container(border=True):
         st.subheader("Bond Contract")
         
-        # Bond Contract section - split the four input fields across two columns (left / right)
         col_contract_left, col_contract_right = st.columns(2)
         with col_contract_left:
             face_value = st.number_input("Face Value (R)", value=1000)
@@ -60,24 +58,24 @@ with tab_Calculator:
             maturity = st.number_input("Maturity (years)", value=10)
             frequency = st.number_input("Frequency", value=1)
         
-        # Create an instance / onject of the Bond Class - contains business logic 
-        bond = Bond(face_value, coupon_rate, maturity, frequency)
+        # Create an instance / object of the Bond Class - contains business logic 
+        try:
+            bond = Bond(face_value, coupon_rate, maturity, frequency)
+        except ValueError as e:
+            st.error(str(e))
+            st.stop()           # Prevent remaining code from running if a bond is never defined
 
-    # Yield Anslysis section - Calculate Bond Price based on provided yield & yield to maturity based on market price
+    # Yield Analysis section - Calculate Bond Price based on provided yield & yield to maturity based on market price
     with st.container(border=True):
         st.subheader("Yield Analysis")
         col_price_calc, col_ytm = st.columns(2)
         
-        # Block - Calculate Bond Price based on provided yield
         with col_price_calc:
             with st.container(border=True):        
                 yield_rate = st.slider("Select a yield rate", min_value=0.0, max_value=1.0, value=0.05, key="analysis_yield")
                 bond_price = bond.price(yield_rate)
+                display_metric("Bond Price", bond_price, prefix="R ")
 
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.metric(label="Bond Price", value=f"R {bond_price:.2f}")
-
-        # Block - Calculate yield to maturity based on market price
         with col_ytm:
             with st.container(border=True):
                 max_market_price = bond.price(0.0001)   # Create market price within Bond's ytm methods bisection solver's bounds
@@ -92,43 +90,35 @@ with tab_Calculator:
                 yield_to_maturity = bond.ytm(market_price)
                 display_metric("Yield to Maturity", yield_to_maturity, suffix = " %")
     
-    # Risk Measures section - display duration & convexity of Bond
     with st.container(border=True):
         st.subheader("Risk Measures")
 
-        # Interactive input slider for User to select yield rate
         yield_rate = st.slider("Select a yield rate", min_value=0.0, max_value=1.0, value=0.05, key="risk_measures_yield")
         
-        # Call Bond Class methods to calulcate risk measures
         macaulay_duration = bond.macaulay_duration(yield_rate)
         modified_duration = bond.modified_duration(yield_rate)
         convexity = bond.convexity(yield_rate)
         
-        # Display 3 columns for each of the 3 risk measures and display each one next to each other
         col_macaulay_duration, col_modified_duration, col_convexity = st.columns(3)
-
-        # Block - display Macaulay Duration block
         with col_macaulay_duration:
             with st.container(border=True):        
                 display_metric("Macaulay Duration", macaulay_duration, suffix = " years")
 
-        # Block - display Modified Duration block
         with col_modified_duration:
             with st.container(border=True):        
                 display_metric("Modified Duration", modified_duration, suffix = " %")
 
-        # Block - display Convexity block
         with col_convexity:
             with st.container(border=True):        
                 display_metric("Convexity", convexity)
 
 
 # Price vs Yield Relationship Visualization Tab
-with tab_Visualiser:
+with tab_visualiser:
     with st.container(border=True):
         st.subheader("Visualiser")
 
-        # Create three "pills" / buttons that can be selected as different bond comparison options
+        # Create three pills that can be selected as different bond comparison options
         selection = st.pills("Compare bonds", ["Bond 1", "Bond 2", "Bond 3"], selection_mode="multi")
         selection = sorted(selection)   # Sort the three Bonds into the correct order so that Bond 1 always displays to the left of Bond 2, etc.
 
@@ -145,20 +135,24 @@ with tab_Visualiser:
                         # On any event where the input widget is changed, save the new input by calling the save_bond function 
                         # Pass in a unique key for each Bond's widgets as an ID for Streamlit to be able to identify
                         fv = st.number_input("Face Value (R)", value=defaults["fv"], key=f"fv_{bond_name}", on_change=save_bond, args=(bond_name,))     
-                        cr = st.number_input("Coupon Rate (%)", value=defaults["cr"], key=f"ni_{bond_name}", on_change=save_bond, args=(bond_name,))
+                        cr = st.number_input("Coupon Rate (%)", value=defaults["cr"], key=f"cr_{bond_name}", on_change=save_bond, args=(bond_name,))
                         m = st.number_input("Maturity (years)", value=defaults["m"], key=f"mat_{bond_name}", on_change=save_bond, args=(bond_name,))
                         f = st.number_input("Frequency", value=defaults["f"], key=f"feq_{bond_name}", on_change=save_bond, args=(bond_name,))
-                        
-                bonds.append(Bond(fv, cr, m, f))    # Use input data from relevant Bond to create an instance of the Bond class for Bond 1, 2, 3.
 
-            # Build the Comparison Graph
-            # Build using the pyplot module from the Matplotlib package
+                try:      
+                    bonds.append(Bond(fv, cr, m, f))    # Use input data from relevant Bond to create an instance of the Bond class for Bond 1, 2, 3.
+                except ValueError as e:
+                    st.error(str(e))
+                    bonds.append(None)
+
+            # Build Comparison Graph
             yield_range = np.linspace(0.01, 0.15, 100)      # Define a range of yield rates over which the bonds can be compared
             fig, ax = plt.subplots()    
             for i, bond_name in enumerate(selection):
-                ax.plot(yield_range * 100, bonds[i].price_range(yield_range), label=bond_name)  # Add a new graph as a subplot onto the same figure
+                if bonds[i] is not None:
+                    ax.plot(yield_range * 100, bonds[i].price_range(yield_range), label=bond_name)  # Add a new graph as a subplot onto the same figure
             ax.set_title("Price-Yield Comparison")
             ax.set_xlabel("Yield [%]")
             ax.set_ylabel("Bond Price [R]")
             ax.legend()
-            st.pyplot(fig)  # Call to Streamlit to display the Matplotlib pyplot figure
+            st.pyplot(fig)
