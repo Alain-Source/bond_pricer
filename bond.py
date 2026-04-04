@@ -9,6 +9,16 @@ class Bond:
             maturity: Number of years to maturity
             frequency: Coupon payments per year (1 = annual, 2 = semi-annual)
         """
+        if face_value <= 0:
+            raise ValueError("Face value must be positive")
+        if not 0 <= coupon_rate <= 1:
+            raise ValueError("Coupon rate must be between 0 and 1")
+        if maturity <= 0:
+            raise ValueError("Maturity must be positive")
+        if not isinstance(maturity, int):
+            raise ValueError("Maturity must be a whole number to represent years")
+        if frequency not in [1, 2, 4, 12]:
+            raise ValueError("Frequency must be 1 (annual), 2 (semi-annual), 4 (quarterly), or 12 (monthly)")
 
         self.face_value = face_value
         self.coupon_rate = coupon_rate      
@@ -42,6 +52,9 @@ class Bond:
         Returns:
             Bond price as a float (e.g. 12532.45)
         """
+        if yield_rate < 0:
+            raise ValueError("Yield rate cannot be negative")
+
         period_yield_rate = yield_rate / self.frequency  
                                                                                
         bond_price = 0                                                                                                         # Bond Price Formula | PV = SUM_1_to_n(PMT / (1 + r)^n) + FV/(1 + r)^n , n = {1,2,..,n} 
@@ -61,21 +74,28 @@ class Bond:
         Returns:
             Yield to maturity as a decimal (e.g. 0.05 for 5%)
         """
+        if market_price <= 0:
+            raise ValueError("Market price must be positive")
+
         test_yield_lower_bound = 0.0001
         test_yield_upper_bound = 1
         midpoint = (test_yield_upper_bound + test_yield_lower_bound) / 2        # Guess what the yield is by testing the midpoint between the two values
         test_price = self.price(midpoint)                                       # Calculate what the bond price is at that midpoint yield
-
+        iterations = 0
+    
         # Check whether the price resulting from the test yield's bounds equal to 
         # or within the specified accuracy of the market price.
         while abs(test_price - market_price) >= accuracy:                       
+            if iterations > 1000:
+                raise ValueError("YTM did not converge — market price outside valid range")
             if market_price > test_price:                                       
                test_yield_upper_bound = midpoint                                # test_price is less than the market price (the upper bound was too high)
             else:
                 test_yield_lower_bound = midpoint                               # test_price is greater than the market price (the lower bound was too low)
             
             midpoint = (test_yield_upper_bound + test_yield_lower_bound) / 2    # Guess what the yield is by testing the midpoint between the two values
-            test_price = self.price(midpoint)                                   # Calculate what the bond price is at that midpoint yield
+            test_price = self.price(midpoint)   
+            iterations += 1                                # Calculate what the bond price is at that midpoint yield
         return midpoint
 
 
