@@ -90,3 +90,6 @@ Higher convexity is always desirable - when yields rise, the bond's price falls 
 
 Next steps include building a more realistic yield curve from market data, and adding day count conventions.
 A further extension would be implementing the Vasicek interest rate model to simulate bond prices under random interest rate movements which would transform the project from a calculator into a stochastic simulation.
+
+## License
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
