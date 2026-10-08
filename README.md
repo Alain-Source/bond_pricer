@@ -75,8 +75,8 @@ bond_pricer/
 
 ## Testing
 Tests cover two areas:
-- **Input validation** — confirms that input handling (negative values, non-integer maturity, unsupported frequencies) does throw an error in the Bond Class
-- **Calculation accuracy** — confirms that pricing, YTM, duration, and convexity are correctly calculated and checks results against known analytical results (par bond pricing, zero-coupon duration, price-yield relationship)
+- **Input validation** confirms that input handling (negative values, non-integer maturity, unsupported frequencies) does throw an error in the Bond Class
+- **Calculation accuracy** confirms that pricing, YTM, duration, and convexity are correctly calculated and checks results against known analytical results (par bond pricing, zero-coupon duration, price-yield relationship)
 
 Run with `python3 test_bond.py`
 
@@ -86,10 +86,10 @@ Learned how to structure a Python project to separate business logic (Bond class
 Implemented a bisection method to solve the YTM of a bond based on its market price. Built unit tests in Python to verify input handling and calculation accuracy for the first time.
 
 On the financial side, gained a deeper understanding of how duration and convexity are used together to describe a bond's yield rate sensitivity.
-Higher convexity is always desirable - when yields rise, the bond's price falls less than a lower convexity equivalent, while falling yields cause the price to rise further.
+Higher convexity is always desirable, when yields rise, the bond's price falls less than a lower convexity equivalent, while falling yields cause the price to rise further.
 
 Next steps include building a more realistic yield curve from market data, and adding day count conventions.
 A further extension would be implementing the Vasicek interest rate model to simulate bond prices under random interest rate movements which would transform the project from a calculator into a stochastic simulation.
 
 ## License
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License, see the [LICENSE](LICENSE) file for details.
